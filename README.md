@@ -1,9 +1,9 @@
 # Claude Desktop Skills Portfolio
 
-> 20 production-ready Claude skills capturing 153,200 monthly searches across Career, Creator, and Growth domains.
+> 21 production-ready Claude skills capturing 153,200+ monthly searches across Career, Creator, Growth, and Developer domains.
 
-[![Skills](https://img.shields.io/badge/Skills-20-blue)]()
-[![Monthly Searches](https://img.shields.io/badge/Monthly%20Searches-153.2K-green)]()
+[![Skills](https://img.shields.io/badge/Skills-21-blue)]()
+[![Monthly Searches](https://img.shields.io/badge/Monthly%20Searches-153.2K%2B-green)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow)]()
 
 Built by [Me, Myself Plus AI LLC](https://memyselfplusai.com) | Specialized in Claude ecosystem, n8n workflows, and AI automation
@@ -14,6 +14,11 @@ Built by [Me, Myself Plus AI LLC](https://memyselfplusai.com) | Specialized in C
 
 - [Overview](#overview)
 - [Skill Suites](#skill-suites)
+  - [Career Suite](#-career-suite-57900-searchesmonth)
+  - [Creator Suite](#-creator-suite-52600-searchesmonth)
+  - [Growth Suite](#-growth-suite-39300-searchesmonth)
+  - [Specialized Tools](#-specialized-tools-14200-searchesmonth)
+  - [Developer Tools](#-developer-tools)
 - [Quick Start](#quick-start)
 - [Skill Catalog](#skill-catalog)
 - [Examples](#examples)
@@ -25,18 +30,18 @@ Built by [Me, Myself Plus AI LLC](https://memyselfplusai.com) | Specialized in C
 
 ## Overview
 
-This repository contains 20 validated, production-ready Claude Desktop skills built using the Model Context Protocol (MCP). Each skill addresses a specific, high-demand use case validated by search volume data.
+This repository contains 21 validated, production-ready Claude Desktop skills built using the Model Context Protocol (MCP). Each skill addresses a specific, high-demand use case validated by search volume data.
 
 ### What Makes These Skills Unique
 
 - **✅ Validated Demand**: Every skill targets 3K-14K monthly searches
 - **✅ Production-Ready**: Complete with examples, edge cases, and quality checks
-- **✅ Suite-Based**: Organized into cohesive product lines (Career, Creator, Growth)
+- **✅ Suite-Based**: Organized into cohesive product lines (Career, Creator, Growth, Developer)
 - **✅ Integration-Ready**: Designed to work with n8n workflows and automation
-- **✅ Lightweight**: Total portfolio size ~73KB
+- **✅ Lightweight**: Total portfolio size ~86KB
 
 ### Total Market Reach
-**153,200 monthly searches** across all 20 skills
+**153,200+ monthly searches** across all 21 skills
 
 ---
 
@@ -85,6 +90,13 @@ This repository contains 20 validated, production-ready Claude Desktop skills bu
 | Amazon Product Review Generator | 5,900 | Compliant review guidance |
 | Legal Document Simplifier | 4,900 | Plain-language contract summaries |
 | Technical Document Simplifier | 3,400 | API docs for non-technical users |
+
+### 🔨 Developer Tools
+**Target Audience**: MCP developers, AI engineers, system architects
+
+| Skill | Purpose |
+|-------|---------|
+| MCP Forge | Guide users through designing production-ready MCP server PRDs with tool specifications, architecture decisions, and implementation guidance |
 
 ---
 
@@ -167,6 +179,21 @@ routine that transformed mine 👇
 #ProductivityHacks #MorningRoutine #EntrepreneurLife
 ```
 
+**MCP Forge**
+```
+Input: "I want to build an MCP server that connects to Notion"
+
+Output:
+[Guides through comprehensive PRD including:]
+- Server overview and scope
+- Tool specifications with parameters
+- Error handling strategies
+- Authentication patterns
+- Rate limiting considerations
+- Testing approach
+- Deployment guidelines
+```
+
 See [docs/SKILL_CATALOG.md](docs/SKILL_CATALOG.md) for complete trigger patterns and examples.
 
 ---
@@ -219,6 +246,13 @@ See [docs/SKILL_CATALOG.md](docs/SKILL_CATALOG.md) for complete trigger patterns
 
 </details>
 
+<details>
+<summary><b>Developer Tools (1 skill)</b></summary>
+
+21. **mcp-forge** - Production-ready MCP server PRD generation with architecture guidance, tool specifications, and implementation best practices
+
+</details>
+
 ---
 
 ## Development
@@ -250,16 +284,19 @@ skill-name/
 - Job seekers crafting applications
 - Content creators producing social media
 - Sales reps personalizing outreach
+- AI engineers building MCP servers
 
 ### Teams & Agencies
 - HR departments writing job descriptions
 - Marketing teams creating ad copy
 - Customer success simplifying technical docs
+- Development teams designing tool integrations
 
 ### Automation Workflows (n8n Integration)
 - Auto-summarize Zoom meetings → Slack
 - Generate job descriptions from templates → ATS
 - Personalize cold emails from LinkedIn scrapes → CRM
+- Design MCP servers from requirements → PRD documentation
 
 ### Example n8n Workflow
 ```
@@ -311,7 +348,7 @@ Specialized in:
 - Production MCP server development
 
 **Portfolio**: [memyselfplusai.com](https://memyselfplusai.com)  
-**Contact**: [matthew@memyselfplusai.com]  
+**Contact**: matthew@memyselfplusai.com  
 **GitHub**: [@m2ai-portfolio](https://github.com/m2ai-portfolio)
 
 ---
