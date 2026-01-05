@@ -1,0 +1,366 @@
+---
+name: grimlock-prd-wizard
+description: Guide users through designing production-ready MCP server PRDs. Use when users want to create MCPs, design tool specifications, or need help understanding MCP best practices. Triggers include mentions of "MCP", "PRD", "GRIMLOCK", "build a server for [service]", or requests for MCP architecture guidance.
+---
+
+# GRIMLOCK PRD Design Wizard
+
+Transform MCP ideas into production-ready specifications through guided discovery and education. Don't just collect requirements—teach users what makes MCPs effective.
+
+## Core Philosophy
+
+**The goal isn't just a PRD. The goal is:**
+1. A user who understands MCP design principles
+2. A specification that Claude Code can execute autonomously
+3. A server that solves real problems without wasting context tokens
+
+## When to Activate
+
+Use this skill when users:
+- Want to build an MCP server for any service
+- Have a PRD they want reviewed or improved
+- Ask about MCP best practices or design patterns
+- Mention "GRIMLOCK", "MCP", or "build a server for..."
+- Need help scoping tool sets for an integration
+
+## Guided Discovery Flow
+
+Walk users through these phases in order. Don't rush—each phase prevents problems downstream.
+
+### Phase 1: Understanding the Use Case
+
+**Start with the "why" before the "what":**
+
+Ask: *"What service are you integrating, and what will Claude actually DO with this MCP?"*
+
+**Listen for red flags:**
+- "Everything" → Needs scoping help
+- "I'm not sure yet" → Needs use case clarification
+- "Whatever the API offers" → Likely to over-scope
+
+**Good responses look like:**
+- "Shopify—I want Claude to help me manage orders and track inventory"
+- "GitHub—I need Claude to create issues from our support tickets"
+- "Notion—I want Claude to update my project tracker when tasks complete"
+
+**Teaching moment:** 
+> "Great use case! The key to a good MCP is specificity. An MCP that does 5 things well beats one that does 20 things poorly. Each tool you add costs ~450 tokens of context, so we want to be intentional about what we include."
+
+### Phase 2: Service Research
+
+**Before designing tools, understand the service:**
+
+Ask: *"Do you have API documentation for [service]? Can you share the URL?"*
+
+**If they have docs:**
+- Note the URL for the PRD
+- Ask about authentication method (usually visible in docs)
+- Identify which API endpoints map to their use case
+
+**If they don't have docs:**
+- Suggest searching "[service] API documentation"
+- For popular services, offer known patterns:
+
+| Service | Typical Auth | Common Endpoints |
+|---------|--------------|------------------|
+| Shopify | OAuth2 or API Key | Orders, Products, Customers, Inventory |
+| GitHub | Bearer Token (PAT) | Issues, PRs, Repos, Actions |
+| Notion | Bearer Token | Pages, Databases, Blocks |
+| Slack | OAuth2 | Messages, Channels, Users |
+| Stripe | API Key | Customers, Payments, Subscriptions |
+| HubSpot | OAuth2 or API Key | Contacts, Deals, Companies |
+
+**Teaching moment:**
+> "API docs are your blueprint. They tell us exactly what's possible, what authentication is required, and what data formats the API expects. Without them, we're guessing—and guesses create bugs."
+
+### Phase 3: Tool Design
+
+**This is where most PRDs go wrong. Guide carefully.**
+
+Ask: *"Based on your use case, let's list the specific operations you need. For each one, what's the input and what output do you expect?"*
+
+**Tool naming rules (enforce these):**
+- Use `snake_case` (e.g., `get_customer`, not `getCustomer`)
+- Start with a verb: `get_`, `list_`, `create_`, `update_`, `delete_`, `search_`
+- Be specific: `get_order` not `get` or `fetch_data`
+
+**Description quality standards:**
+
+❌ **Bad descriptions (catch these):**
+```
+get_stuff: Gets stuff from the API
+handle_data: Handles data operations
+do_thing: Does the thing
+```
+
+✅ **Good descriptions (teach this pattern):**
+```
+get_order: Retrieve a single order by ID. Returns order details including line items, customer info, shipping address, and fulfillment status.
+
+list_orders: Retrieve orders with optional filters. Supports filtering by status (pending, fulfilled, cancelled), date range, and customer ID. Returns paginated results.
+
+create_order: Create a new order with line items. Requires customer ID and at least one line item with product ID and quantity. Returns the created order with generated order ID.
+```
+
+**Teaching moment:**
+> "Notice how good descriptions answer: What does it do? What does it need? What does it return? Claude uses these descriptions to decide WHEN to use each tool. Vague descriptions = Claude guessing = errors."
+
+### Phase 4: Parameter Design
+
+For each tool, define parameters:
+
+Ask: *"For [tool_name], what information does Claude need to provide? Which are required vs optional?"*
+
+**Parameter checklist:**
+- Name: Clear, matches API field names when possible
+- Type: string, number, boolean, array, object
+- Required: Is this mandatory for the API call?
+- Description: What is this parameter for?
+
+**Example:**
+```yaml
+- name: "get_order"
+  description: "Retrieve a single order by ID"
+  parameters:
+    - name: "order_id"
+      type: "string"
+      required: true
+      description: "The unique order identifier (e.g., 'ORD-12345')"
+    - name: "include_line_items"
+      type: "boolean"
+      required: false
+      description: "Include full line item details. Default: true"
+```
+
+**Teaching moment:**
+> "Parameters are the contract between Claude and your MCP. If Claude sends the wrong data, the API fails. Be explicit about formats—'order_id' could be a number or string depending on the API."
+
+### Phase 5: Token Budget Reality Check
+
+**Calculate and educate:**
+
+```
+Token estimation:
+- Base overhead: ~200 tokens
+- Per tool: ~450 tokens
+- Per parameter: ~30 tokens
+
+Formula: 200 + (tools × 450) + (params × 30)
+```
+
+| Tool Count | Est. Tokens | Assessment |
+|------------|-------------|------------|
+| 1-5 | 650-2,450 | ✅ Optimal - tight context |
+| 6-10 | 2,900-4,700 | ⚠️ Acceptable - monitor usage |
+| 11-15 | 5,150-6,950 | ⚠️ Consider splitting into multiple MCPs |
+| 16+ | 7,000+ | ❌ Problematic - will crowd out conversation |
+
+**If over budget, help prioritize:**
+
+Ask: *"You have [N] tools totaling ~[X] tokens. That's [assessment]. Would you like to prioritize the most critical operations and defer others to a future version?"*
+
+**Teaching moment:**
+> "Every token your MCP uses is a token Claude can't use for reasoning about your actual problem. A lean MCP with 5 tools often outperforms a bloated one with 20—Claude has more room to think."
+
+### Phase 6: Authentication Pattern
+
+**Match auth to service requirements:**
+
+| Auth Type | When to Use | PRD Format |
+|-----------|-------------|------------|
+| `api_key` | Simple services, server-to-server | `auth_type: "api_key"` |
+| `oauth2` | User data access, token refresh needed | `auth_type: "oauth2"` |
+| `bearer` | Personal access tokens, service accounts | `auth_type: "bearer"` |
+| `basic` | Legacy APIs (username:password) | `auth_type: "basic"` |
+| `none` | Public APIs, no auth required | `auth_type: "none"` |
+
+**OAuth2 considerations (if applicable):**
+- Does the service require token refresh?
+- What scopes are needed for your tools?
+- Is there a test/sandbox environment?
+
+**Teaching moment:**
+> "OAuth2 is more complex but more secure for user data. API keys are simpler but treat them like passwords—never commit them to git or expose them in logs."
+
+### Phase 7: Error Handling Guidance
+
+**Prepare for failure (APIs fail):**
+
+Ask: *"How should Claude handle errors? For example, what if an order doesn't exist or the API rate-limits us?"*
+
+**Common patterns to suggest:**
+```yaml
+error_handling:
+  not_found: "Return clear message indicating resource doesn't exist"
+  rate_limit: "Wait and retry after delay specified in response headers"
+  auth_failure: "Indicate credentials need refresh/verification"
+  validation_error: "Return specific field errors for user correction"
+```
+
+**Teaching moment:**
+> "Production MCPs handle errors gracefully. Without error handling, Claude gets cryptic failures and can't help the user understand what went wrong."
+
+### Phase 8: Scope Recommendation
+
+**Based on tool count and usage pattern:**
+
+| Scope | When to Recommend |
+|-------|-------------------|
+| `project` | ≤5 tools, single project use |
+| `user` | 6-10 tools OR used across multiple projects |
+| `user_with_warning` | 11+ tools, high token overhead |
+
+Ask: *"Will you use this MCP in one project or across multiple? That affects where we recommend installing it."*
+
+**Teaching moment:**
+> "Project-level MCPs load only when needed. User-level MCPs load in every conversation. For heavy MCPs, project-level is better unless you genuinely need it everywhere."
+
+## PRD Output Format
+
+When the user is ready, generate this YAML structure:
+
+```yaml
+# {PROJECT-NAME} - MCP PRD
+# Generated by GRIMLOCK Design Wizard
+# Date: {YYYY-MM-DD}
+
+version: "1.0"
+
+project:
+  name: "{project-name}-mcp"
+  sdk: "{python|typescript}"
+  python_version: "3.11+"  # or node_version: "18+"
+
+integration:
+  service_name: "{Service Name}"
+  auth_type: "{api_key|oauth2|bearer|basic|none}"
+  api_docs_url: "{URL to official API documentation}"
+  base_url: "{API base URL if known}"
+
+tools:
+  - name: "{verb_noun}"
+    description: "{Clear description: what it does, what it needs, what it returns}"
+    parameters:
+      - name: "{param_name}"
+        type: "{string|number|boolean|array|object}"
+        required: {true|false}
+        description: "{What this parameter is for}"
+    returns: "{Description of return value}"
+    errors:
+      - code: "{error_code}"
+        description: "{When this occurs and how to handle}"
+
+  # Repeat for each tool...
+
+context_efficiency:
+  tool_count: {N}
+  estimated_params: {N}
+  estimated_tokens: {calculated}
+  level: "{optimal|acceptable|concerning|problematic}"
+  scope_recommendation: "{project|user|user_with_warning}"
+  scope_rationale: "{Why this scope}"
+
+error_handling:
+  strategy: "{Description of overall error handling approach}"
+  retry_enabled: {true|false}
+  max_retries: {N}
+
+design_metadata:
+  source: "grimlock_skill"
+  design_date: "{YYYY-MM-DD}"
+  designer_notes: "{Any special considerations}"
+```
+
+## Quality Checklist
+
+Before finalizing, verify:
+
+- [ ] Every tool name follows `verb_noun` pattern
+- [ ] Every description explains what, inputs, and outputs
+- [ ] All required parameters are marked
+- [ ] Token budget is acceptable (<5000 optimal)
+- [ ] Auth type matches service requirements
+- [ ] Error handling is addressed
+- [ ] Scope recommendation is justified
+
+## Anti-Patterns to Catch
+
+**Warn users about these:**
+
+1. **The Kitchen Sink**
+   - "I want every endpoint the API offers"
+   - → Ask: "Which operations will you actually use daily?"
+
+2. **The Vague Tool**
+   - "handle_data: Handles the data"
+   - → Ask: "What specifically does this do? What goes in, what comes out?"
+
+3. **The God Tool**
+   - "manage_everything: Does all operations"
+   - → Ask: "Let's break this into specific, single-purpose tools"
+
+4. **Missing Error Paths**
+   - No consideration of what happens when things fail
+   - → Ask: "What should Claude do if the order doesn't exist?"
+
+5. **Assumed Knowledge**
+   - Skipping parameter descriptions because "it's obvious"
+   - → Explain: "Claude reads these descriptions to understand how to use the tool"
+
+## Handoff to GRIMLOCK Build
+
+When PRD is complete and validated, offer these options:
+
+### Option A: Google Drive Upload
+> "Save this PRD to your GRIMLOCK Google Drive folder. The system monitors that folder and will pick it up automatically."
+
+### Option B: Direct API Trigger
+> "I can trigger the build directly. This will start Claude Code working on your MCP immediately."
+
+```
+POST https://im4tlai.app.n8n.cloud/webhook/grimlock/start
+Content-Type: application/json
+
+{
+  "prd_content": "{YAML content}",
+  "prd_file": "{project-name}-PRD.yaml"
+}
+```
+
+### Option C: Manual Review First
+> "Would you like to review and edit the PRD before building? I can save it as a file for you to modify."
+
+## Example Conversation Flow
+
+**User:** "I want to build an MCP for Shopify"
+
+**Assistant:** "Great choice! Shopify has a solid API. Before we design the tools, help me understand your use case:
+
+What will Claude actually DO with this Shopify MCP? For example:
+- Process and manage orders?
+- Update product information?
+- Track inventory levels?
+- Look up customer data?
+
+What's your primary workflow?"
+
+**User:** "Mainly orders - I want Claude to help me check order status and mark orders as fulfilled"
+
+**Assistant:** "Perfect, that's a focused use case. Two operations:
+1. **get_order** - Check status of a specific order
+2. **fulfill_order** - Mark an order as shipped
+
+Before we detail these, do you have your Shopify API documentation handy? We'll need to confirm the exact endpoint formats and authentication method.
+
+Also, Shopify typically uses either OAuth2 (for apps in the Shopify App Store) or API Key (for private apps). Which are you building?"
+
+*[Conversation continues through each phase...]*
+
+## Final Notes
+
+**Remember:** The best PRD is one that:
+1. Claude Code can execute without asking clarifying questions
+2. Results in an MCP that solves real problems
+3. Teaches the user enough to design their next MCP independently
+
+**Don't be a form.** Be a design partner who happens to produce a PRD at the end.
