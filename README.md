@@ -2,7 +2,7 @@
   <img src="assets/banner.png" alt="Claude Skills" width="800">
 </p>
 
-<h3 align="center">21 production-ready skills for Claude Desktop across Career, Creator, Growth, and Developer domains</h3>
+<h3 align="center">21 production-ready skills for Claude Desktop across Career, Creator, Growth, and Developer domains + Marketing Agents plugin</h3>
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> &bull;
